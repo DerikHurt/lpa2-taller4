@@ -69,3 +69,40 @@ Antes de usar el *prompt*, recopila esta información de tu API de Música, para
 12. Revisa y ajusta la configuración del API
 13. Para ejecutar en modo producción: `pnpm build` y luego: `pnpm start`
 
+
+---
+
+## Implementación
+
+El frontend se generó con **Claude Code** (el profesor permitió usar cualquier herramienta de IA). En [`PROMPT.md`](PROMPT.md) está el JSON con los *endpoints* de la API y el *prompt* completo, por si se quiere reproducir en v0.app.
+
+**Tecnologías:** Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4 y TanStack Query.
+
+**Funcionalidades:**
+
+- **Panel:** totales de usuarios, canciones y favoritos, y estado de la API (`/health`).
+- **Canciones:** listado paginado, búsqueda por título, artista y género, y crear, editar y eliminar.
+- **Usuarios:** listado paginado, crear, editar y eliminar, y página de detalle con sus favoritos.
+- **Favoritos:** listado general, registrar y eliminar.
+- **Usuario activo:** se elige en la barra superior y permite marcar favoritos con ♡ desde el catálogo.
+- **Validación en tiempo real:** usa las mismas reglas que el backend y muestra los errores de la API (422 y 400) junto a cada campo.
+- **Estados de la interfaz:** carga, vacío y error con reintento, y notificaciones de éxito.
+
+### Ejecutar en Windows
+
+1. Tener la API del lpa2-taller3 corriendo en `http://127.0.0.1:8000`:
+   ```bash
+   uvicorn main:app --reload
+   ```
+2. Instalar Node 20 o superior (desde [nodejs.org](https://nodejs.org) o con `winget install OpenJS.NodeJS.LTS`) y PNPM:
+   ```bash
+   npm install -g pnpm
+   ```
+3. En este directorio, instalar las dependencias:
+   ```bash
+   pnpm install
+   ```
+4. Si la API está en otra URL, copiar `.env.example` como `.env.local` y ajustar `NEXT_PUBLIC_API_URL`.
+5. Modo desarrollo: `pnpm dev`, y abrir [localhost:3000](http://localhost:3000/).
+6. Modo producción: `pnpm build` y luego `pnpm start`.
+7. *Linter*: `pnpm lint`.
