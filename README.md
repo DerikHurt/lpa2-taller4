@@ -88,21 +88,82 @@ El frontend se generó con **Claude Code** (el profesor permitió usar cualquier
 - **Validación en tiempo real:** usa las mismas reglas que el backend y muestra los errores de la API (422 y 400) junto a cada campo.
 - **Estados de la interfaz:** carga, vacío y error con reintento, y notificaciones de éxito.
 
+### Requisitos
+
+| Herramienta | Versión | Instalación en Windows |
+|---|---|---|
+| Git | cualquiera reciente | [git-scm.com](https://git-scm.com) o `winget install Git.Git` |
+| Python | 3.12 o superior (para la API) | [python.org](https://www.python.org) o `winget install Python.Python.3.12` |
+| Node.js | 20 o superior | [nodejs.org](https://nodejs.org) o `winget install OpenJS.NodeJS.LTS` |
+| pnpm | 9 o superior | `npm install -g pnpm` (después de instalar Node) |
+
+Para comprobar que quedaron instalados, en una terminal nueva:
+
+```bash
+git --version
+python --version
+node --version
+pnpm --version
+```
+
 ### Ejecutar en Windows
 
-1. Tener la API del lpa2-taller3 corriendo en `http://127.0.0.1:8000`:
-   ```bash
-   uvicorn main:app --reload
-   ```
-2. Instalar Node 20 o superior (desde [nodejs.org](https://nodejs.org) o con `winget install OpenJS.NodeJS.LTS`) y PNPM:
-   ```bash
-   npm install -g pnpm
-   ```
-3. En este directorio, instalar las dependencias:
-   ```bash
-   pnpm install
-   ```
-4. Si la API está en otra URL, copiar `.env.example` como `.env.local` y ajustar `NEXT_PUBLIC_API_URL`.
-5. Modo desarrollo: `pnpm dev`, y abrir [localhost:3000](http://localhost:3000/).
-6. Modo producción: `pnpm build` y luego `pnpm start`.
-7. *Linter*: `pnpm lint`.
+Se necesitan **dos terminales**: una para la API y otra para el frontend.
+
+**1. Obtener el código** (si aún no se tiene):
+
+```bash
+git clone https://github.com/DerikHurt/lpa2-taller3.git
+git clone https://github.com/DerikHurt/lpa2-taller4.git
+```
+
+**2. Levantar la API (terminal 1, en la carpeta `lpa2-taller3`):**
+
+```bash
+python -m venv venv                 # solo la primera vez
+venv\Scripts\activate               # en PowerShell: venv\Scripts\Activate.ps1
+pip install -r requirements.txt     # solo la primera vez
+uvicorn main:app --reload
+```
+
+La API queda en [http://127.0.0.1:8000](http://127.0.0.1:8000) y su documentación en [/docs](http://127.0.0.1:8000/docs). Para comprobar que funciona, abrir [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health): debe responder `"status": "healthy"`.
+
+**3. Levantar el frontend (terminal 2, en la carpeta `lpa2-taller4`):**
+
+```bash
+pnpm install    # solo la primera vez, o cuando cambie package.json
+pnpm dev
+```
+
+Abrir [http://localhost:3000](http://localhost:3000/). El indicador de la barra superior debe decir **API en línea**.
+
+**4. Primeros datos:** si la base de datos está vacía, el panel lo indica. Se pueden crear usuarios y canciones desde la propia aplicación, o cargarlos con DBeaver como pide el Taller 3. Después, se elige un usuario en **Escuchando como…** para marcar favoritos.
+
+### Otros comandos
+
+| Comando | Para qué sirve |
+|---|---|
+| `pnpm build` y luego `pnpm start` | Compilar y ejecutar en modo producción |
+| `pnpm lint` | Revisar el código con ESLint |
+| `pnpm dev --port 3001` | Usar otro puerto si el 3000 está ocupado |
+
+### Configuración
+
+El frontend busca la API en `http://127.0.0.1:8000` por defecto. Si está en otra dirección, se copia `.env.example` como `.env.local` y se ajusta la variable:
+
+```bash
+NEXT_PUBLIC_API_URL=http://127.0.0.1:8000
+```
+
+> **Importante:** Next.js lee esta variable al arrancar. Después de cambiarla hay que detener `pnpm dev` (Ctrl + C) y volver a ejecutarlo.
+
+### Solución de problemas
+
+| Síntoma | Causa probable y solución |
+|---|---|
+| «No se pudo conectar con la API en …» | La API no está corriendo o está en otro puerto. Levantarla (paso 2), revisar `/health` y pulsar **Reintentar**. |
+| El mensaje muestra un puerto distinto al de la API | `NEXT_PUBLIC_API_URL` apunta a otra dirección, en `.env.local` o en una variable de la terminal. Corregirla y reiniciar `pnpm dev` desde una terminal nueva. |
+| `pnpm` no se reconoce como comando | Falta instalarlo (`npm install -g pnpm`) o abrir una terminal nueva después de instalarlo. |
+| `Port 3000 is in use` | Otro programa usa el puerto. Cerrarlo o ejecutar `pnpm dev --port 3001`. |
+| PowerShell no deja ejecutar `Activate.ps1` | Usar `venv\Scripts\activate.bat` desde `cmd`, o ejecutar una vez `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`. |
+| Las tablas aparecen vacías | La base de datos no tiene registros. Ver el paso 4. |
